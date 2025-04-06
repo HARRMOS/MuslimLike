@@ -5,6 +5,7 @@ app = Flask(__name__)
 
 @app.route("/content/<int:content_id>/likes", methods=["GET"])
 def get_likes(content_id):
+    conn = None
     try:
         # Connexion à la base de données
         conn = mysql.connector.connect(
@@ -37,12 +38,13 @@ def get_likes(content_id):
     
     finally:
         # Fermer la connexion
-        if conn.is_connected():
+        if conn and conn.is_connected():
             conn.close()
 
 
 @app.route("/content/<int:content_id>/like", methods=["POST"])
 def like_content(content_id):
+    conn = None
     try:
         # Récupérer l'ID de l'utilisateur dans le corps de la requête
         user_id = request.json.get("userId")
@@ -93,7 +95,7 @@ def like_content(content_id):
 
     finally:
         # Fermer la connexion
-        if conn.is_connected():
+        if conn and conn.is_connected():
             conn.close()
 
 
