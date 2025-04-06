@@ -1,8 +1,4 @@
-fastapi
-uvicorn
-aiomysql
-gunicorn==20.1.0
-flask==2.1.2
-werkzeug==2.1.2
-boto3==1.35.90
-mysql-connector-python
+fastapi==0.100.0
+uvicorn==0.22.0
+aiomysql==0.1.1
+mysql-connector-python==8.0.33
