@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import mysql.connector
 
 app = Flask(__name__)
@@ -9,7 +9,7 @@ def get_likes(content_id):
         # Connexion à la base de données
         conn = mysql.connector.connect(
             host="mh285989-001.eu.clouddb.ovh.net",
-            port=35693,  # Spécifier le port ici
+            port=35693,
             user="bts",
             password="Harris91270",
             database="MuslimVibe"
@@ -25,9 +25,6 @@ def get_likes(content_id):
         )
         result = cursor.fetchone()
 
-        # Fermer la connexion
-        conn.close()
-
         # Vérifier si le contenu existe
         if result:
             return jsonify({"likes": result["like_count"]})
@@ -37,6 +34,11 @@ def get_likes(content_id):
     except mysql.connector.Error as e:
         # Gestion des erreurs de connexion
         return jsonify({"error": f"Erreur lors de la connexion à la base de données: {str(e)}"}), 500
+    
+    finally:
+        # Fermer la connexion
+        if conn.is_connected():
+            conn.close()
 
 
 @app.route("/content/<int:content_id>/like", methods=["POST"])
@@ -45,10 +47,13 @@ def like_content(content_id):
         # Récupérer l'ID de l'utilisateur dans le corps de la requête
         user_id = request.json.get("userId")
 
+        if not user_id:
+            return jsonify({"error": "L'ID utilisateur est requis"}), 400
+
         # Connexion à la base de données
         conn = mysql.connector.connect(
             host="mh285989-001.eu.clouddb.ovh.net",
-            port=35693,  # Spécifier le port ici
+            port=35693,
             user="bts",
             password="Harris91270",
             database="MuslimVibe"
@@ -82,12 +87,14 @@ def like_content(content_id):
             conn.commit()
             return jsonify({"liked": True})
 
-        # Fermer la connexion
-        conn.close()
-
     except mysql.connector.Error as e:
         # Gestion des erreurs de connexion
         return jsonify({"error": f"Erreur lors de la connexion à la base de données: {str(e)}"}), 500
+
+    finally:
+        # Fermer la connexion
+        if conn.is_connected():
+            conn.close()
 
 
 if __name__ == "__main__":
